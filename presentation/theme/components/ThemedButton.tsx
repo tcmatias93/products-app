@@ -12,11 +12,11 @@ const ThemedButton = ({ children, icon, ...rest }: Props) => {
 
   return (
     <Pressable
-      {...rest}
       style={({ pressed }) => [
         { backgroundColor: pressed ? primaryColor + "90" : primaryColor },
         style.button,
       ]}
+      {...rest}
     >
       <Text style={style.colorText}>{children}</Text>
       {icon && (
