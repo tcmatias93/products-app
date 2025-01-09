@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   ScrollView,
   useWindowDimensions,
@@ -10,10 +11,38 @@ import ThemedTextInput from "@/presentation/theme/components/ThemedTextInput";
 import ThemedButton from "@/presentation/theme/components/ThemedButton";
 import ThemedLink from "@/presentation/theme/components/ThemedLink";
 import { useThemeColor } from "@/presentation/theme/hooks/useThemeColor";
+import { authRegister } from "@/core/auth/actions/auth-actions";
+import { router } from "expo-router";
 
 const RegisterScreen = () => {
   const { height } = useWindowDimensions();
   const backgroundColor = useThemeColor({}, "background");
+  const [isPosting, setIsPosting] = useState(false);
+  const [form, setForm] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+  });
+
+  const handlerRegister = async () => {
+    const { fullName, email, password } = form;
+    if (fullName.length === 0 || email.length === 0 || password.length === 0) {
+      return null;
+    }
+    setIsPosting(true);
+
+    const wasSuccessful = await authRegister(fullName, email, password);
+    setIsPosting(false);
+
+    if (wasSuccessful.status === 400) {
+      Alert.alert("Alerta", `${wasSuccessful.message}`);
+      return null;
+    }
+
+    if (wasSuccessful) {
+      router.push("/auth/login");
+    }
+  };
 
   return (
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
@@ -33,26 +62,33 @@ const RegisterScreen = () => {
             placeholder="Nombre completo"
             autoCapitalize="words"
             icon="person-outline"
+            value={form.fullName}
+            onChangeText={(value) => setForm({ ...form, fullName: value })}
           />
           <ThemedTextInput
             placeholder="Correo electronico"
             keyboardType="email-address"
             autoCapitalize="none"
             icon="mail-outline"
+            value={form.email}
+            onChangeText={(value) => setForm({ ...form, email: value })}
           />
           <ThemedTextInput
             placeholder="Contraseña"
             secureTextEntry
             autoCapitalize="none"
             icon="lock-closed-outline"
+            value={form.password}
+            onChangeText={(value) => setForm({ ...form, password: value })}
           />
         </View>
 
         <View style={{ marginVertical: 10 }} />
         {/* Boton */}
         <ThemedButton
-          onPress={() => console.log("funciona")}
+          onPress={handlerRegister}
           icon="arrow-forward-outline"
+          disabled={isPosting}
         >
           Crear cuenta
         </ThemedButton>

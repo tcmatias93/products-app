@@ -8,6 +8,8 @@ export interface AuthResponse {
   isActive: boolean;
   roles: string[];
   token: string;
+  status?: number;
+  message?: string;
 }
 
 const returnUserToken = (data: AuthResponse) => {
@@ -44,5 +46,47 @@ export const authCheckStatus = async () => {
     return returnUserToken(data);
   } catch (error) {
     null;
+  }
+};
+
+export const authRegister = async (
+  fullName: string,
+  email: string,
+  password: string
+) => {
+  email = email.toLocaleLowerCase();
+
+  try {
+    const { data } = await productsApi.post<AuthResponse>("/auth/register", {
+      fullName,
+      email,
+      password,
+    });
+
+    return data;
+  } catch (error: any) {
+    // Error de respuesta de la API
+    if (error.response) {
+      const status = error.response.status;
+      const message =
+        error.response.data?.message || "Error al autenticar usuario.";
+      return { status, message };
+    }
+
+    // Error de red
+    if (error.request) {
+      return {
+        status: 0,
+        message:
+          "No se pudo conectar con el servidor. Verifica tu conexión a internet.",
+      };
+    }
+
+    // Error interno
+    console.error("AuthLogin error:", error);
+    return {
+      status: 500,
+      message: "Ocurrió un error inesperado. Por favor, inténtalo nuevamente.",
+    };
   }
 };
