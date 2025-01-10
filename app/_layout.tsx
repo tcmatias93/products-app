@@ -14,9 +14,19 @@ import GestureHandlerRootView from "react-native-gesture-handler";
 import { useColorScheme } from "@/presentation/theme/hooks/useColorScheme";
 import { View } from "react-native";
 import { useThemeColor } from "@/presentation/theme/hooks/useThemeColor";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+//Esto va en el punto mas alto de mi app
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -38,14 +48,15 @@ export default function RootLayout() {
   }
 
   return (
-    <View style={{ backgroundColor: backgroundColor, flex: 1 }}>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack screenOptions={{ headerShown: false }}>
-          {/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" /> */}
-        </Stack>
-        <StatusBar style="auto" />
-      </ThemeProvider>
-    </View>
+    <QueryClientProvider client={queryClient}>
+      <View style={{ backgroundColor: backgroundColor, flex: 1 }}>
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
+          <Stack screenOptions={{ headerShown: false }}></Stack>
+          <StatusBar style="auto" />
+        </ThemeProvider>
+      </View>
+    </QueryClientProvider>
   );
 }
