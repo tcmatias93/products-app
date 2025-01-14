@@ -17,21 +17,19 @@ export const useProduct = (productId: string) => {
 
   //Mutacion
   const productMutation = useMutation({
-    mutationFn: async (data: Product) => {
-      //Disparar la accion de guardar
-      return updateCreateProduct({
+    mutationFn: async (data: Product) =>
+      updateCreateProduct({
         ...data,
         id: productIdRef.current,
-      });
-    },
+      }),
     onSuccess(data: Product) {
       productIdRef.current = data.id;
-      //Invalidar products queries
+
       queryClient.invalidateQueries({
         queryKey: ["products", "infinite"],
       });
       queryClient.invalidateQueries({
-        queryKey: ["productos", data.id],
+        queryKey: ["products", data.id],
       });
 
       Alert.alert("Producto guardado", `${data.title} se guardo correctamente`);
