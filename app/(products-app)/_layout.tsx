@@ -48,6 +48,8 @@ const CheckAuthentificationLayout = () => {
         name="(home)/index"
         options={{ title: "Productos", headerLeft: () => <LogoutIconButton /> }}
       />
+
+      <Stack.Screen name="product/[id]" options={{ title: "Producto" }} />
     </Stack>
   );
 };
